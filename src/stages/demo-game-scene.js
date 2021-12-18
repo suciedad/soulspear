@@ -1,8 +1,27 @@
 import { Scene } from 'phaser';
+import { PerksManager } from '../components/perks/perks-manager';
 
 import { APP_SIZE } from '../constants/app';
-import { PLAYER } from '../constants/game';
+import { PERKS_ABILITIES, PLAYER, TEST_PERKS } from '../constants/game';
 import { SCENE_KEY } from '../constants/scene-key';
+
+/**
+ * BLESS
+ * 1) Increase damage
+ * 2) Increase attack speed
+ * 3) Movement don't stop attacking
+ * 4) Increase HP
+ * 5) Evasion
+ */
+
+/**
+ * CURSE
+ * 1) Camera shaking
+ * 2) Turn off light
+ * 3) Decrease damage
+ * 4) Random attacking
+ * 5) Movement control reversed
+ */
 
 export class DemoGameScene extends Scene {
   constructor() {
@@ -17,12 +36,20 @@ export class DemoGameScene extends Scene {
     );
     this.player.setCollideWorldBounds(true);
 
-    this.upKey = this.input.keyboard.addKey('UP');
-    this.downKey = this.input.keyboard.addKey('DOWN');
-    this.leftKey = this.input.keyboard.addKey('LEFT');
-    this.rightKey = this.input.keyboard.addKey('RIGHT');
-
     this.pointer = this.input.activePointer;
+
+    const asdf = new PerksManager();
+    console.log((window.asdf = asdf));
+
+    // +100px to hide borders on camera shaking
+    const gr = this.add.graphics();
+    gr.fillStyle(0x000000, 1)
+      .fillRect(0, 0, APP_SIZE.WIDTH + 100, APP_SIZE.HEIGHT + 100)
+      .generateTexture('light-off', APP_SIZE.WIDTH + 100, APP_SIZE.HEIGHT + 100)
+      .destroy();
+    this.darken = this.add
+      .image(APP_SIZE.WIDTH * 0.5, APP_SIZE.HEIGHT * 0.5, 'light-off')
+      .setAlpha(PERKS_ABILITIES.LIGHT_OFF_OPACITY);
   }
 
   update() {
@@ -32,23 +59,10 @@ export class DemoGameScene extends Scene {
       this.movePlayerByPointer();
     }
 
-    if (this.leftKey.isDown) {
-      this.player.setVelocityX(-PLAYER.VELOCITY_X);
-      this.player.flipX = true;
-    }
-
-    if (this.rightKey.isDown) {
-      this.player.setVelocityX(PLAYER.VELOCITY_X);
-      this.player.flipX = false;
-    }
-
-    if (this.upKey.isDown) {
-      this.player.setVelocityY(-PLAYER.VELOCITY_Y);
-    }
-
-    if (this.downKey.isDown) {
-      this.player.setVelocityY(PLAYER.VELOCITY_Y);
-    }
+    this.darken.setVisible(TEST_PERKS.CURSE['Turn off light']);
+    this.darken.setAlpha(PERKS_ABILITIES.LIGHT_OFF_OPACITY);
+    TEST_PERKS.CURSE['Camera shaking'] &&
+      this.cameras.main.shake(50, PERKS_ABILITIES.CAMERA_SHAKING_INTENSITY);
   }
 
   movePlayerByPointer() {

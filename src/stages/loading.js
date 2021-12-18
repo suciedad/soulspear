@@ -83,7 +83,7 @@ export class Loading extends Scene {
     this.load.on('complete', () => {
       progressBar.destroy();
 
-      this.scene.start(SCENE_KEY.MAIN_MENU);
+      this.scene.start(SCENE_KEY.DEMO_GAME_SCENE);
     });
   }
 }
