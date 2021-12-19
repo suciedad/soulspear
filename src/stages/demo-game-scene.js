@@ -1,8 +1,14 @@
 import { Scene } from 'phaser';
+import { Bullet } from '../components/bullet';
 import { PerksManager } from '../components/perks/perks-manager';
 
 import { APP_SIZE } from '../constants/app';
-import { PERKS_ABILITIES, PLAYER, TEST_PERKS } from '../constants/game';
+import {
+  ENEMY_DIAGONAL,
+  PERKS_ABILITIES,
+  PLAYER,
+  TEST_PERKS,
+} from '../constants/game';
 import { SCENE_KEY } from '../constants/scene-key';
 
 /**
@@ -36,6 +42,17 @@ export class DemoGameScene extends Scene {
     );
     this.player.setCollideWorldBounds(true);
 
+    this.enemy = this.physics.add.sprite(100, 200, 'red-player');
+    this.enemy
+      .setVelocity(ENEMY_DIAGONAL.MOVEMENT_SPEED)
+      .setBounce(1, 1)
+      .setCollideWorldBounds(true);
+
+    this.playerBullets = this.physics.add.group({
+      classType: Bullet,
+      runChildUpdate: true,
+    });
+
     this.pointer = this.input.activePointer;
 
     const asdf = new PerksManager();
@@ -50,13 +67,17 @@ export class DemoGameScene extends Scene {
     this.darken = this.add
       .image(APP_SIZE.WIDTH * 0.5, APP_SIZE.HEIGHT * 0.5, 'light-off')
       .setAlpha(PERKS_ABILITIES.LIGHT_OFF_OPACITY);
+
+    this.lastFired = 0;
   }
 
-  update() {
+  update(time) {
     this.player.setVelocity(0);
 
     if (this.pointer.isDown) {
       this.movePlayerByPointer();
+    } else {
+      this.autoFire(time);
     }
 
     this.darken.setVisible(TEST_PERKS.CURSE['Turn off light']);
@@ -73,5 +94,21 @@ export class DemoGameScene extends Scene {
     );
 
     this.player.flipX = this.player.body.velocity.x < 0;
+  }
+
+  autoFire(time) {
+    if (time - this.lastFired > PLAYER.ATTACK_SPEED) {
+      this.lastFired = time;
+
+      var bullet = this.playerBullets.get().setActive(true).setVisible(true);
+
+      if (bullet) {
+        bullet.fire(this.player, this.enemy);
+        // Add collider between bullet and player
+        // this.physics.add.collider(this.enemy, bullet, () =>
+        //   console.log('enemy hited'),
+        // );
+      }
+    }
   }
 }

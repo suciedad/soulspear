@@ -11,6 +11,8 @@ import bluePlayer from '../assets/blue-player.png';
 import yellowPlayer from '../assets/yellow-player.png';
 import mainMenuButton from '../assets/main-menu-button-2.png';
 
+import projectile from '../assets/projectile.png';
+
 // Nine Slice samples
 import topLeft from '../assets/samples/nine-slice/top-left.png';
 import topRight from '../assets/samples/nine-slice/top-right.png';
@@ -50,6 +52,8 @@ export class Loading extends Scene {
     this.load.image('blue-player', bluePlayer);
     this.load.image('yellow-player', yellowPlayer);
     this.load.image('main-menu-button', mainMenuButton);
+
+    this.load.image('projectile', projectile);
 
     // Nine Slice samples
     this.load.image('top-left', topLeft);

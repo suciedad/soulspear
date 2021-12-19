@@ -1,5 +1,11 @@
 export const PLAYER = {
   VELOCITY_POINTER: 150,
+  ATTACK_SPEED: 400,
+  PROJECTILE_SPEED: 0.1,
+};
+
+export const ENEMY_DIAGONAL = {
+  MOVEMENT_SPEED: 200,
 };
 
 export const PERKS = {
