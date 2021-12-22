@@ -88,6 +88,7 @@ export class Loading extends Scene {
       progressBar.destroy();
 
       this.scene.start(SCENE_KEY.DEMO_GAME_SCENE);
+      // this.scene.start('qwe');
     });
   }
 }

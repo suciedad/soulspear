@@ -1,6 +1,8 @@
-import { Scene } from 'phaser';
+import { GameObjects, Scene } from 'phaser';
 import { Bullet } from '../components/bullet';
+import { Enemy } from '../components/enemy';
 import { PerksManager } from '../components/perks/perks-manager';
+import { Unit } from '../components/unit';
 
 import { APP_SIZE } from '../constants/app';
 import {
@@ -10,6 +12,8 @@ import {
   TEST_PERKS,
 } from '../constants/game';
 import { SCENE_KEY } from '../constants/scene-key';
+import { composeMixins, HpBarMixin, HpMixin } from '../mixins';
+import { HP_EVENTS } from '../mixins/hp-mixin';
 
 /**
  * BLESS
@@ -29,6 +33,15 @@ import { SCENE_KEY } from '../constants/scene-key';
  * 5) Movement control reversed
  */
 
+const hpBarStyle = {
+  bgColor: 0x555555,
+  barColor: 0x00ff00,
+  width: 50,
+  height: 7,
+  padding: 2,
+  borderRadius: 0,
+};
+
 export class DemoGameScene extends Scene {
   constructor() {
     super({ key: SCENE_KEY.DEMO_GAME_SCENE });
@@ -42,11 +55,37 @@ export class DemoGameScene extends Scene {
     );
     this.player.setCollideWorldBounds(true);
 
+    // Not working texture
+    // const Player = composeMixins(
+    //   HpMixin(50, 45),
+    //   HpBarMixin(hpBarStyle),
+    // )(GameObjects.Sprite);
+    // this.testPlayer = new Player(
+    //   this,
+    //   APP_SIZE.WIDTH * 0.5 + 150,
+    //   APP_SIZE.HEIGHT * 0.5 + 150,
+    //   'blue-player',
+    // );
+
     this.enemy = this.physics.add.sprite(100, 200, 'red-player');
     this.enemy
       .setVelocity(ENEMY_DIAGONAL.MOVEMENT_SPEED)
       .setBounce(1, 1)
       .setCollideWorldBounds(true);
+
+    const qwe = new Enemy(this, 100, 100, 5);
+    window.enemy = qwe;
+    qwe.on('damaged', () => console.log(123));
+    qwe.on('killed', ({ target }) =>
+      console.log(`You gain ${target.reward} gold!`),
+    );
+
+    this.testDoll = new Unit(this);
+    this.testDoll.on(HP_EVENTS.KILLED, () => {
+      const reward = this.testDoll.getReward();
+      const shards = reward.shards;
+      console.log(`You received ${shards} shards`);
+    });
 
     this.playerBullets = this.physics.add.group({
       classType: Bullet,
@@ -56,7 +95,7 @@ export class DemoGameScene extends Scene {
     this.pointer = this.input.activePointer;
 
     const asdf = new PerksManager();
-    console.log((window.asdf = asdf));
+    console.log((window.perks = asdf));
 
     // +100px to hide borders on camera shaking
     const gr = this.add.graphics();
@@ -103,11 +142,13 @@ export class DemoGameScene extends Scene {
       var bullet = this.playerBullets.get().setActive(true).setVisible(true);
 
       if (bullet) {
-        bullet.fire(this.player, this.enemy);
+        bullet.fire(this.player, this.testDoll);
         // Add collider between bullet and player
-        // this.physics.add.collider(this.enemy, bullet, () =>
-        //   console.log('enemy hited'),
-        // );
+        this.physics.add.collider(this.testDoll.hitZone, bullet, () => {
+          console.log('enemy hited');
+          bullet.destroy();
+          this.testDoll.takeDamage(20);
+        });
       }
     }
   }

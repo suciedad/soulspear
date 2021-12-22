@@ -1,6 +1,9 @@
 import { Actions, GameObjects, Utils } from 'phaser';
 
-// TODO: add stackable/not-stackable behavior
+export const DRAG_AND_DROP_GRID_EVENT = {
+  ITEM_DROPPED_IN_SLOT: 'dropped-in-slot',
+};
+
 export class DragAndDropGrid extends GameObjects.Container {
   constructor(scene, x, y, size, qty) {
     super(scene, x, y);
@@ -22,13 +25,12 @@ export class DragAndDropGrid extends GameObjects.Container {
     console.log(this);
 
     Actions.GridAlign(this.dropZones, {
-      cellWidth: size + 10,
-      cellHeight: size + 10,
+      cellWidth: size + 25,
+      cellHeight: size + 25,
       x: 0,
       y: 0,
       position: 6,
-      width: 5,
-      height: 2,
+      width: -1,
     });
 
     const graphics = scene.add.graphics().lineStyle(2, 0xffff00);
@@ -41,24 +43,6 @@ export class DragAndDropGrid extends GameObjects.Container {
         zone.input.hitArea.height,
       );
     });
-
-    // Items inside container for test
-    // for (let i = 0; i < qty; i += 1) {
-    //   const testItem = this.createTestItem(scene, size, true);
-
-    //   scene.input.setDraggable(testItem);
-    //   this.dragItems.push(testItem);
-    //   this.add(testItem);
-    // }
-
-    // Actions.GridAlign(this.dragItems, {
-    //   cellWidth: size + 10,
-    //   cellHeight: size + 10,
-    //   x: 0,
-    //   y: -100,
-    //   position: 6,
-    //   width: -1,
-    // });
 
     scene.input.on('drag', this.handleDrag.bind(this));
     scene.input.on('drop', this.handleDrop.bind(this));
@@ -83,6 +67,11 @@ export class DragAndDropGrid extends GameObjects.Container {
         gameObject.y = dropZone.y + dropZone.parentContainer.y;
 
         gameObject.input.enabled = false;
+
+        this.emit(DRAG_AND_DROP_GRID_EVENT.ITEM_DROPPED_IN_SLOT, {
+          item: gameObject,
+          slot: dropZone,
+        });
       } else {
         gameObject.x = gameObject.input.dragStartX;
         gameObject.y = gameObject.input.dragStartY;
