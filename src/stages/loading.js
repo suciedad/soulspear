@@ -24,6 +24,11 @@ import left from '../assets/samples/nine-slice/left.png';
 import right from '../assets/samples/nine-slice/right.png';
 import bg from '../assets/samples/nine-slice/bg.png';
 
+// Tilemap
+// import dungeon from '../assets/soulspear_test.json';
+import dungeon from '../assets/dungeon_map.json';
+import dungeonTiles from '../assets/0x72_DungeonTilesetII_v1.4.png';
+
 import { ProgressBar } from '../components/progress-bar';
 
 const PROGRESS_STYLE = {
@@ -66,6 +71,10 @@ export class Loading extends Scene {
     this.load.image('right', right);
     this.load.image('bg', bg);
 
+    // Tilemap
+    this.load.image('dungeon-tiles', dungeonTiles);
+    this.load.tilemapTiledJSON('dungeon', dungeon);
+
     // TODO - add samples for audio, font, animations
     // Sounds
 
@@ -88,7 +97,6 @@ export class Loading extends Scene {
       progressBar.destroy();
 
       this.scene.start(SCENE_KEY.DEMO_GAME_SCENE);
-      // this.scene.start('qwe');
     });
   }
 }

@@ -10,6 +10,7 @@ import { addDatGui, addFPSMeter } from './utils';
 import { Loading } from './stages/loading';
 import { MainMenu } from './stages/main-menu';
 import { DemoGameScene } from './stages/demo-game-scene';
+import { DemoBattlefieldScene } from './stages/demo-battlefield-scene';
 import { ChoosePerksScene } from './scenes/choose-perks';
 
 addDatGui();
@@ -20,7 +21,13 @@ const GAME_SETTINGS = {
   height: APP_SIZE.HEIGHT,
   parent: APP_CONTAINER_ID,
   backgroundColor: APP_BACKGROUND_COLOR,
-  scene: [Loading, MainMenu, DemoGameScene, ChoosePerksScene],
+  scene: [
+    Loading,
+    MainMenu,
+    DemoGameScene,
+    DemoBattlefieldScene,
+    ChoosePerksScene,
+  ],
   physics: {
     default: 'arcade',
     arcade: {

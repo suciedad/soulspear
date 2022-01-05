@@ -16,12 +16,17 @@ const hpBarStyle = {
 };
 
 const Base = composeMixins(
-  HpMixin(25, 25),
+  HpMixin(30, 30),
   HpBarMixin(hpBarStyle),
   RewardMixin({ shards: 7 }),
 )(GameObjects.Container);
 
-export class Unit extends Base {
+const STATE = {
+  STANDING: 'standing',
+  WALKING: 'walking',
+};
+
+export class AttackingUnit extends Base {
   constructor(scene) {
     super(
       scene,
@@ -29,7 +34,9 @@ export class Unit extends Base {
       Math.Between(200, APP_SIZE.HEIGHT - 200),
     );
 
-    this.unitSprite = new GameObjects.Image(scene, 0, 0, 'yellow-player');
+    this.state = STATE.STANDING;
+
+    this.unitSprite = new GameObjects.Image(scene, 0, 0, 'red-player');
 
     this.hitZone = new GameObjects.Zone(
       scene,
@@ -37,7 +44,7 @@ export class Unit extends Base {
       0,
       this.unitSprite.width,
       this.unitSprite.height,
-    ).setInteractive({ useCursorHand: true });
+    ).setInteractive();
 
     const hpBarPositionX = -this.hpBar.width * 0.5;
     const hpBarPositionY =
@@ -50,5 +57,44 @@ export class Unit extends Base {
 
     scene.add.existing(this);
     scene.physics.add.existing(this.hitZone);
+
+    this.on('walking', () => {
+      scene.time.addEvent({
+        delay: 1000,
+        callback: () => {
+          if (this && this.body) {
+            this.state = STATE.STANDING;
+
+            this.body.stop();
+
+            console.log('standing');
+            this.emit('standing');
+          }
+        },
+      });
+    });
+
+    this.on('standing', () => {
+      scene.time.addEvent({
+        delay: 2000,
+        callback: () => {
+          if (this && this.body) {
+            this.state = STATE.WALKING;
+
+            scene.physics.moveTo(
+              this,
+              Math.Between(0, APP_SIZE.WIDTH),
+              Math.Between(0, APP_SIZE.HEIGHT),
+              200,
+            );
+
+            console.log('walking');
+            this.emit('walking');
+          }
+        },
+      });
+    });
+
+    this.emit('standing');
   }
 }

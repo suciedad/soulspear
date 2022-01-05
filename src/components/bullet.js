@@ -36,7 +36,7 @@ export class Bullet extends GameObjects.Image {
     this.y += this.ySpeed * delta;
     this.born += delta;
 
-    if (this.born > 1800) {
+    if (this.born > 10000) {
       this.setActive(false);
       this.setVisible(false);
     }
